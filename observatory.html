@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iriki Observatory Weather Page</title>
+  <meta name="description" content="入来観測所のスカイカメラ画像、ドーム内温度、2日間の天気予報をまとめて確認できるページです。">
+  <link rel="stylesheet" href="observatory.css">
+</head>
+<body>
+  <header class="site-header observatory-header">
+    <div class="container header-inner">
+      <div>
+        <p class="observatory-site-label">Iriki Observatory</p>
+        <a class="site-title" href="observatory.html">Iriki Observatory Weather Page</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-title">
+      <div class="container">
+        <!-- <p class="eyebrow">Observatory Status</p> -->
+        <h1>Observatory Status</h1>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container observatory-dashboard">
+        <article class="sky-camera-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Sky Camera</p>
+              <h2>全天カメラ</h2>
+            </div>
+            <span class="status-pill neutral" id="sky-camera-status">更新中</span>
+          </div>
+          <div class="camera-stack">
+            <figure class="sky-camera-image primary-camera">
+              <!-- 自動更新画像のURLが決まったら、下のsrcを差し替えてください。 -->
+              <img id="sky-camera-img" src="../capt0000.jpg" alt="入来観測所のスカイカメラ画像">
+              <figcaption>入来観測所スカイカメラ</figcaption>
+            </figure>
+
+            <figure class="dome-camera-slot">
+              <div class="camera-placeholder">Dome Camera（なんとかする）</div>
+              <figcaption>ドーム内カメラ</figcaption>
+            </figure>
+          </div>
+        </article>
+
+        <aside class="observatory-side">
+          <article class="status-card">
+            <div class="panel-heading compact">
+              <div>
+                <p class="eyebrow">Night Info</p>
+                <h2>夜間情報</h2>
+              </div>
+              <span class="status-pill neutral" id="night-date">--</span>
+            </div>
+            <dl class="mini-info-grid">
+              <div>
+                <dt>日没</dt>
+                <dd id="sunset-time">--:--</dd>
+              </div>
+              <div>
+                <dt>翌朝日の出</dt>
+                <dd id="sunrise-time">--:--</dd>
+              </div>
+              <div>
+                <dt>天文薄明終了</dt>
+                <dd id="twilight-end-time">--:--</dd>
+              </div>
+              <div>
+                <dt>天文薄明開始</dt>
+                <dd id="dawn-twilight-start-time">--:--</dd>
+              </div>
+              <div>
+                <dt>月齢</dt>
+                <dd id="moon-age">--.-</dd>
+              </div>
+            </dl>
+            <p class="data-note">
+              毎朝９時に入来観測所付近の緯度経度から計算しています。
+              参考: <a href="https://www.motohasi.net/SunriseSunset/WorldSun.php" target="_blank" rel="noopener noreferrer">日本と世界の日の出日の入り時間</a>
+            </p>
+          </article>
+
+          <article class="status-card">
+            <div class="panel-heading compact">
+              <div>
+                <p class="eyebrow">Dome</p>
+                <h2>温度・湿度</h2>
+              </div>
+              <span class="status-pill pending">準備中</span>
+            </div>
+            <dl class="measurement-list">
+              <div>
+                <dt>ドーム内温度</dt>
+                <dd>--.- <span>deg C</span></dd>
+              </div>
+              <div>
+                <dt>ドーム内湿度</dt>
+                <dd>-- <span>%</span></dd>
+              </div>
+              <div>
+                <dt>ドーム外温度</dt>
+                <dd>--.- <span>deg C</span></dd>
+              </div>
+              <div>
+                <dt>ドーム外湿度</dt>
+                <dd>-- <span>%</span></dd>
+              </div>
+            </dl>
+            <p class="data-note">温度センサーの値を接続後、ここに最新値を表示します。</p>
+          </article>
+
+          <!-- <article class="status-card compact-status-card">
+            <div class="panel-heading compact">
+              <div>
+                <p class="eyebrow">Weather Safety</p>
+                <h2>観測安全</h2>
+              </div>
+              <span class="status-pill pending" id="weather-safety-label">取得中</span>
+            </div>
+            <dl class="safety-status-grid setup-status-grid">
+              <div>
+                <dt>判定</dt>
+                <dd><span class="state-dot unknown" id="weather-safety-dot"></span><span id="weather-safety-text">--</span></dd>
+              </div>
+              <div>
+                <dt>超過数</dt>
+                <dd id="weather-safety-count">--</dd>
+              </div>
+            </dl>
+            <p class="data-note compact-note">MET Norwayの現在時刻付近の予報値に基づく判定です。</p>
+            <dl class="threshold-list">
+              <div><dt>雲量</dt><dd><span id="threshold-cloud">--</span> / &lt; 40%</dd></div>
+              <div><dt>降水量</dt><dd><span id="threshold-precipitation">--</span> / 0 mm</dd></div>
+              <div><dt>湿度</dt><dd><span id="threshold-humidity">--</span> / &lt; 90%</dd></div>
+              <div><dt>風速</dt><dd><span id="threshold-wind">--</span> / &lt; 8 m/s</dd></div>
+            </dl>
+          </article> -->
+        </aside>
+      </div>
+    </section>
+
+    <section class="section soft-bg">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Weather Forecast</p>
+          <h2>天気予報</h2>
+          <p>MET NorwayのLocationforecast APIをもとに、入来観測所付近の今後24時間の雲量、降水量、湿度、風速、気温を表示します。</p>
+        </div>
+
+        <article class="weather-chart-panel">
+          <div class="panel-heading compact">
+            <div>
+              <p class="eyebrow">24 Hours</p>
+              <h3>24時間グラフ</h3>
+            </div>
+            <span class="status-pill pending" id="hourly-status">取得準備中</span>
+          </div>
+          <div class="weather-chart" id="weather-chart" aria-live="polite">
+            <p class="data-note">時間ごとの天気情報を取得しています。</p>
+          </div>
+        </article>
+        <p class="source-note">
+          24時間グラフ: <a href="https://api.met.no/" target="_blank" rel="noopener noreferrer">Weather data by MET Norway</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>&copy; Iriki Observatory</p>
+      <p>表示内容は観測準備の補助情報です。実際の観測判断では最新の現地情報を確認してください。</p>
+    </div>
+  </footer>
+  <script src="observatory-camera.js"></script>
+  <script src="observatory-night.js"></script>
+  <script src="observatory-weather.js"></script>
+</body>
+</html>
