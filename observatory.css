@@ -128,6 +128,18 @@ p {
   padding: 40px 0;
 }
 
+.observatory-dashboard-section {
+  padding-bottom: 16px;
+}
+
+.dome-trend-section {
+  padding-top: 0;
+}
+
+.instrument-section {
+  padding-top: 0;
+}
+
 .soft-bg {
   background: var(--color-soft-bg);
 }
@@ -268,6 +280,96 @@ p {
   color: var(--color-muted);
 }
 
+.dome-trend-figure {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: #ffffff;
+}
+
+.dome-trend-figure img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 8 / 3;
+  object-fit: contain;
+  background: #ffffff;
+}
+
+.dome-trend-figure figcaption {
+  padding: 10px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.dome-trend-panel {
+  padding: 16px;
+}
+
+.instrument-panel {
+  padding: 16px;
+}
+
+.instrument-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.instrument-slot {
+  display: grid;
+  gap: 10px;
+  min-height: 150px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-soft-bg);
+}
+
+.instrument-slot.mounted {
+  border-color: #8bd3a8;
+  background: #f3fbf6;
+  box-shadow: inset 4px 0 0 #1f9d55;
+}
+
+.instrument-slot.inactive {
+  color: var(--color-muted);
+  filter: grayscale(1);
+  opacity: 0.72;
+}
+
+.instrument-slot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.instrument-index {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.instrument-slot h3 {
+  margin: 0;
+  color: var(--color-primary-dark);
+  font-size: 1.2rem;
+}
+
+.instrument-slot p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.instrument-slot.mounted p {
+  color: var(--color-text);
+}
+
 .measurement-list,
 .mini-info-grid {
   margin: 0;
@@ -306,14 +408,18 @@ p {
 
 .measurement-list dd {
   color: var(--color-primary-dark);
-  font-size: 1.55rem;
   font-weight: 700;
   line-height: 1.2;
 }
 
-.measurement-list dd span {
+.measurement-list dd .measurement-value {
+  font-size: 1.6rem;
+  letter-spacing: 0;
+}
+
+.measurement-list dd .measurement-unit {
   color: var(--color-muted);
-  font-size: 0.85rem;
+  font-size: 1.0rem;
   font-weight: 700;
 }
 
@@ -367,6 +473,10 @@ p {
 
 @media (max-width: 900px) {
   .observatory-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .instrument-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -641,4 +751,227 @@ p {
 
 .threshold-value.exceeded {
   color: #9b2525;
+}
+
+/* observatory4: page tabs and instrument temperature graphs */
+.page-tabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.page-tab {
+  position: relative;
+  margin: 0 0 -1px;
+  padding: 11px 18px;
+  border: 1px solid transparent;
+  border-bottom-color: var(--color-border);
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  color: var(--color-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.page-tab:hover,
+.page-tab:focus-visible {
+  color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.page-tab:focus-visible {
+  outline: 3px solid rgba(15, 95, 159, 0.25);
+  outline-offset: 2px;
+}
+
+.page-tab.is-active {
+  border-color: var(--color-border);
+  border-bottom-color: #ffffff;
+  background: #ffffff;
+  color: var(--color-primary-dark);
+}
+
+.page-tab-panel[hidden] {
+  display: none;
+}
+
+.instrument-temperature-section {
+  min-height: 58vh;
+}
+
+#instrument-temperature-panel > .instrument-section {
+  padding-top: 32px;
+  padding-bottom: 16px;
+}
+
+#instrument-temperature-panel > .instrument-temperature-section {
+  padding-top: 20px;
+}
+
+.temperature-graph-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.temperature-graph-card {
+  padding: 16px;
+}
+
+.temperature-graph-card:first-child {
+  grid-column: 1 / -1;
+}
+
+.temperature-graph-card .panel-heading h3 {
+  margin: 2px 0 0;
+  color: var(--color-primary-dark);
+  font-size: 1.65rem;
+}
+
+.instrument-current-status {
+  width: min(100%, 920px);
+  margin: 0 auto 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-soft-bg);
+}
+
+.instrument-current-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 10px;
+}
+
+.instrument-current-heading h4 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+.instrument-current-heading p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.instrument-readout-scroll {
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.instrument-readout-table {
+  border: 0;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.45;
+  white-space: nowrap;
+}
+
+.instrument-readout-table th,
+.instrument-readout-table td {
+  padding: 0 10px 0 0;
+  border: 0;
+  text-align: left;
+}
+
+.instrument-readout-table th:not(:first-child) {
+  padding-left: 18px;
+}
+
+.instrument-readout-table td {
+  font-variant-numeric: tabular-nums;
+}
+
+.readout-dome {
+  color: #008000;
+}
+
+.readout-j {
+  color: #0000ff;
+}
+
+.readout-h {
+  color: #008000;
+}
+
+.readout-ks {
+  color: #ff0000;
+}
+
+.readout-cold {
+  color: #800000;
+}
+
+.temperature-graph-figure {
+  width: min(100%, 720px);
+  margin: 0;
+  margin-inline: auto;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: #ffffff;
+}
+
+.temperature-graph-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  background: #ffffff;
+}
+
+.temperature-graph-figure figcaption {
+  padding: 10px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.temperature-refresh-note {
+  text-align: right;
+}
+
+@media (max-width: 700px) {
+  .page-tabs {
+    align-items: stretch;
+  }
+
+  .page-tab {
+    flex: 1;
+    padding: 10px 8px;
+    font-size: 0.9rem;
+  }
+
+  .temperature-graph-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .temperature-graph-card:first-child {
+    grid-column: auto;
+  }
+
+  .instrument-current-heading {
+    display: block;
+  }
+
+  .instrument-current-heading p {
+    margin-top: 4px;
+    white-space: normal;
+  }
+
+  .temperature-refresh-note {
+    text-align: left;
+  }
 }

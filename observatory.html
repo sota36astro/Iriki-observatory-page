@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iriki Observatory Weather Page</title>
   <meta name="description" content="入来観測所のスカイカメラ画像、ドーム内温度、2日間の天気予報をまとめて確認できるページです。">
-  <link rel="stylesheet" href="observatory.css">
+  <link rel="stylesheet" href="observatory.css?v=20260601">
 </head>
 <body>
   <header class="site-header observatory-header">
@@ -81,7 +81,7 @@
               </div>
             </dl>
             <p class="data-note">
-              毎朝９時に入来観測所付近の緯度経度から計算しています。
+              毎朝９時に入来観測所付近の緯度経度から計算しています。<br>
               参考: <a href="https://www.motohasi.net/SunriseSunset/WorldSun.php" target="_blank" rel="noopener noreferrer">日本と世界の日の出日の入り時間</a>
             </p>
           </article>
@@ -92,27 +92,27 @@
                 <p class="eyebrow">Dome</p>
                 <h2>温度・湿度</h2>
               </div>
-              <span class="status-pill pending">準備中</span>
+              <span class="status-pill pending" id="dome-status">取得準備中</span>
             </div>
             <dl class="measurement-list">
               <div>
-                <dt>ドーム内温度</dt>
-                <dd>--.- <span>deg C</span></dd>
+                <dt>テスト温度</dt>
+                <dd><span class="measurement-value" id="dome-temperature">--.-</span> <span class="measurement-unit">度</span></dd>
               </div>
               <div>
-                <dt>ドーム内湿度</dt>
-                <dd>-- <span>%</span></dd>
+                <dt>テスト湿度</dt>
+                <dd><span class="measurement-value" id="dome-humidity">--</span> <span class="measurement-unit">%</span></dd>
               </div>
               <div>
                 <dt>ドーム外温度</dt>
-                <dd>--.- <span>deg C</span></dd>
+                <dd><span class="measurement-value">--.-</span> <span class="measurement-unit">deg C</span></dd>
               </div>
               <div>
                 <dt>ドーム外湿度</dt>
-                <dd>-- <span>%</span></dd>
+                <dd><span class="measurement-value">--</span> <span class="measurement-unit">%</span></dd>
               </div>
             </dl>
-            <p class="data-note">温度センサーの値を接続後、ここに最新値を表示します。</p>
+            <p class="data-note">最新値を1分ごとに表示します。<br>最終更新: <span id="dome-updated-at">--</span></p>
           </article>
 
           <!-- <article class="status-card compact-status-card">
@@ -180,6 +180,7 @@
   </footer>
   <script src="observatory-camera.js"></script>
   <script src="observatory-night.js"></script>
+  <script src="observatory-dome.js"></script>
   <script src="observatory-weather.js"></script>
 </body>
 </html>
