@@ -1,0 +1,52 @@
+/* Experimental timeline styles, loaded only by observatory6.html. */
+.night-timeline-layout { display: grid; gap: 24px; }
+.night-timeline-layout > .status-card { min-width: 0; }
+.timeline-summary { padding: 16px 20px; margin-bottom: 20px; border-left: 4px solid var(--color-primary); background: var(--color-soft-bg); }
+.timeline-summary > p:first-child { margin-bottom: 4px; font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.timeline-summary > p:last-child { margin-bottom: 0; }
+.timeline-view-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.timeline-view-controls button { padding: 8px 16px; border: 1px solid var(--color-border); border-radius: 6px; background: white; color: var(--color-primary-dark); font: inherit; cursor: pointer; }
+.timeline-view-controls button[aria-pressed="true"] { background: var(--color-primary-dark); color: white; border-color: var(--color-primary-dark); }
+.night-timeline-layout button:hover { filter: brightness(.94); }
+.night-timeline-layout button:focus-visible, .timeline-scroll:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 3px; }
+.timeline-scroll { overflow-x: auto; margin-bottom: 12px; border: 1px solid var(--color-border); border-radius: 8px; }
+.timeline-plot { --band-top: 116px; --band-bottom: 204px; position: relative; min-width: 720px; height: 256px; isolation: isolate; }
+.timeline-axis { position: absolute; top: calc(var(--band-bottom) + 12px); height: 24px; left: 24px; right: 24px; }
+.timeline-tick { position: absolute; top: 0; transform: translateX(-50%); color: var(--color-muted); font-size: .78rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.timeline-tick::before { content: ""; position: absolute; left: 50%; top: -12px; height: 7px; border-left: 1px solid #7d8b9d; }
+.timeline-tick:first-child { transform: none; }
+.timeline-tick:first-child::before { left: 0; }
+.timeline-tick:last-child { transform: translateX(-100%); }
+.timeline-tick:last-child::before { left: 100%; }
+.timeline-phase { position: absolute; top: var(--band-top); height: 88px; left: 24px; right: 24px; border: 1px solid #9eacbd; border-radius: 3px; overflow: hidden; z-index: -1; }
+.timeline-phase-label { position: absolute; inset-block: 0; display: grid; place-items: center; font-size: .8rem; color: #22364d; white-space: nowrap; }
+.timeline-phase-label.is-night { color: #e5edf8; }
+#timeline-events { position: absolute; inset: 0 24px; }
+.timeline-event { position: absolute; top: 0; bottom: 0; width: 0; --event-color: #56769d; --line-color: #92acca; }
+.timeline-event-label { position: absolute; top: var(--label-top, 8px); width: max-content; padding: 0 5px; color: var(--event-color); font-size: .82rem; font-weight: 700; line-height: 1.5; white-space: nowrap; background: white; }
+.timeline-event-label small { display: block; color: var(--color-muted); font-weight: 400; font-size: .73rem; font-variant-numeric: tabular-nums; }
+.timeline-event-track { position: absolute; top: var(--line-top, 48px); bottom: calc(100% - var(--band-bottom)); border-left: 1px solid var(--line-color); }
+.timeline-event-track::after { content: ""; position: absolute; left: -4px; bottom: -4px; width: 7px; height: 7px; background: var(--line-color); transform: rotate(45deg); }
+.timeline-event--sun { --event-color: #9b5900; --line-color: #dfa64e; }
+.timeline-event--visible { --event-color: #08796c; --line-color: #20a994; }
+.timeline-event--nir { --event-color: #8250a3; --line-color: #ba82dc; }
+.timeline-event--visible .timeline-event-track, .timeline-event--nir .timeline-event-track { border-left-width: 2px; }
+.timeline-outside-list { display: flex; flex-wrap: wrap; gap: 4px 24px; margin-bottom: 12px; color: var(--color-muted); font-size: .8rem; }
+.timeline-now-track { position: absolute; top: calc(var(--band-top) - 20px); bottom: calc(100% - var(--band-bottom)); left: 24px; right: 24px; pointer-events: none; }
+.timeline-now { position: absolute; top: 0; bottom: 0; border-left: 2px dashed #d63846; }
+.timeline-now span { position: absolute; top: -1px; left: 4px; color: #b51f2c; font-size: .75rem; font-weight: 700; white-space: nowrap; background: white; padding: 0 3px; }
+@media (max-width: 600px) { .timeline-summary { padding: 12px; } }
+
+/* Place the clock at the right edge of the tab bar. */
+.observatory6-navigation { padding: 30px 0 33px; }
+.observatory6-navigation > .container { display: flex; align-items: flex-end; gap: 16px; }
+.observatory6-navigation .page-tabs { flex: 1; min-width: 0; margin-top: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.observatory6-navigation .page-tabs::-webkit-scrollbar { display: none; }
+.observatory6-navigation .page-tab { flex: 0 0 auto; white-space: nowrap; }
+.observatory6-navigation #observatory-clock { font-size: 2.6rem; }
+@media (max-width: 700px) {
+  .observatory6-navigation { padding: 28px 0 30px; }
+  .observatory6-navigation > .container { gap: 12px; }
+  .observatory6-navigation #observatory-clock { font-size: 2.145rem; }
+  .observatory6-navigation .observatory-clock-label { font-size: .65rem; }
+}
