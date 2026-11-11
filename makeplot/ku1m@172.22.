@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+    echo "Usage: $0 LOG_FILE [HOURS]" >&2
+    echo "Example: $0 optcam_log_261031 24" >&2
+}
+
+if (( $# < 1 || $# > 2 )); then
+    usage
+    exit 2
+fi
+
+log_file=$1
+hours=${2:-24}
+
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+plot_file="${script_dir}/OPTCAM_tmp_plot.png"
+json_file="${script_dir}/OPTCAM_latest.json"
+
+ssh_key="/home/pi/.ssh/id_ed25519_irsf"
+ssh_port="30022"
+remote_user="skycamera"
+remote_host="irsf.sci.kagoshima-u.ac.jp"
+remote_dir="/home/skycamera/public_html/obsstatus/plot/"
+remote_destination="${remote_user}@${remote_host}:${remote_dir}"
+
+if [[ ! -f "$log_file" ]]; then
+    echo "Error: log file not found: $log_file" >&2
+    exit 1
+fi
+
+if [[ ! -f "$ssh_key" ]]; then
+    echo "Error: SSH private key not found: $ssh_key" >&2
+    exit 1
+fi
+
+gnuplot -c "${script_dir}/mkplot_optcam.gp" "$log_file" "$plot_file" "$hours"
+
+python3 - "$log_file" "$json_file" <<'PY'
+import datetime
+import json
+import math
+import pathlib
+import sys
+
+# Columns: date time g_set g_measured g_status(3) i_set i_measured i_status(3)
+latest = None
+with open(sys.argv[1], encoding="utf-8") as log:
+    for line_number, line in enumerate(log, 1):
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        try:
+            fields = line.split()
+            timestamp = datetime.datetime.strptime(
+                f"{fields[0]} {fields[1]}", "%Y/%m/%d %H:%M:%S"
+            )
+            if len(fields) != 12:
+                raise ValueError("expected 12 columns for g and i detectors")
+            temperatures = tuple(float(fields[index]) for index in (2, 3, 7, 8))
+            if not all(math.isfinite(value) for value in temperatures):
+                raise ValueError("non-finite temperature")
+        except (IndexError, ValueError) as error:
+            sys.exit(f"Error: invalid log entry at line {line_number}: {error}")
+        if latest is None or timestamp >= latest[0]:
+            latest = (timestamp, *temperatures)
+
+if latest is None:
+    sys.exit("Error: no temperature readings in log")
+
+data = {
+    "timestamp": latest[0].isoformat(),
+    "g": {
+        "setting_temperature": latest[1],
+        "measured_temperature": latest[2],
+    },
+    "i": {
+        "setting_temperature": latest[3],
+        "measured_temperature": latest[4],
+    },
+}
+pathlib.Path(sys.argv[2]).write_text(
+    json.dumps(data, indent=2, allow_nan=False) + "\n", encoding="utf-8"
+)
+PY
+
+scp -i "$ssh_key" -P "$ssh_port" -- "$plot_file" "$json_file" "$remote_destination"
+
+echo "Transferred: $plot_file, $json_file -> $remote_destination ($(date '+%Y-%m-%d %H:%M:%S'))"

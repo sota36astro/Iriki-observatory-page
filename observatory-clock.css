@@ -1,0 +1,47 @@
+.observatory-title-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 20px;
+}
+
+.observatory-title-row h1 {
+  flex: 1;
+  margin: 0;
+  text-align: left;
+}
+
+.observatory-live-clock {
+  flex: 0 0 auto;
+  margin-left: auto;
+  text-align: right;
+  color: var(--color-primary-dark);
+}
+
+.observatory-clock-label {
+  display: block;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+#observatory-clock {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .observatory-title-row {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .observatory-title-row h1 {
+    flex-basis: 100%;
+    text-align: left;
+  }
+}

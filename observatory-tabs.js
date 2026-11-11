@@ -4,6 +4,7 @@
   var tabs = Array.prototype.slice.call(document.querySelectorAll("[data-tab-target]"));
   var panels = Array.prototype.slice.call(document.querySelectorAll(".page-tab-panel"));
   var temperatureImages = Array.prototype.slice.call(document.querySelectorAll("[data-temperature-graph]"));
+  var instrumentSlots = Array.prototype.slice.call(document.querySelectorAll(".instrument-slot[data-instrument]"));
 
   if (!tabs.length || !panels.length) {
     return;
@@ -11,14 +12,45 @@
 
   temperatureImages.forEach(function (image) {
     image.dataset.baseSrc = image.getAttribute("src");
+    image.dataset.baseAlt = image.alt;
+    var caption = image.parentElement.querySelector("figcaption");
+    if (caption) { image.dataset.baseCaption = caption.textContent; }
   });
 
   function refreshTemperatureImages() {
     var cacheBuster = Date.now();
+    var stoppedInstruments = Object.create(null);
+    instrumentSlots.forEach(function (slot) {
+      var status = slot.querySelector(".instrument-slot-header .status-pill");
+      var stopped = status.textContent.trim() === "未搭載";
+      stoppedInstruments[slot.dataset.instrument] = stopped;
+      slot.classList.toggle("mounted", !stopped);
+      slot.classList.toggle("inactive", stopped);
+      if (stopped) {
+        slot.removeAttribute("aria-current");
+      } else {
+        slot.setAttribute("aria-current", "true");
+      }
+      status.classList.toggle("safe", !stopped);
+      status.classList.toggle("neutral", stopped);
+      var description = slot.querySelector("p");
+      if (description) {
+        description.textContent = stopped ? "現在は搭載されていません。" : "使用可能";
+      }
+    });
     temperatureImages.forEach(function (image) {
-      image.src = image.dataset.baseSrc + "?t=" + cacheBuster;
+      var stopped = stoppedInstruments[image.dataset.instrument] === true;
+      var source = stopped ? "makeplot/stopped.png" : image.dataset.baseSrc;
+      image.src = source + "?t=" + cacheBuster;
+      image.alt = stopped ? "装置は停止中（未搭載）" : image.dataset.baseAlt;
+      var caption = image.parentElement.querySelector("figcaption");
+      if (caption) {
+        caption.textContent = stopped ? "停止中（未搭載）" : image.dataset.baseCaption;
+      }
     });
   }
+
+  refreshTemperatureImages();
 
   function activateTab(tab, updateHash) {
     var targetId = tab.dataset.tabTarget;

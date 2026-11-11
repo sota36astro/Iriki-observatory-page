@@ -232,14 +232,15 @@ p {
   background: #08111f;
 }
 
-.sky-camera-image img {
+.sky-camera-image #sky-camera-img {
   display: block;
-  width: 120%;
-  max-width: none;
-  margin-left: -11%;
-  aspect-ratio: 12 / 8;
-  object-fit: cover;
-  object-position: 55% 50%;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
   background: #08111f;
 }
 
@@ -421,6 +422,16 @@ p {
   color: var(--color-muted);
   font-size: 1.0rem;
   font-weight: 700;
+}
+
+.sensor-status-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.sensor-status-list > span {
+  white-space: nowrap;
 }
 
 .data-note {

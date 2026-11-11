@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iriki Observatory Weather Page — Temperature Tab Test</title>
+  <meta name="description" content="入来観測所の全天カメラ、気象情報、観測装置の運用温度をまとめて確認できるページです。">
+  <link rel="stylesheet" href="observatory.css?v=20261002-6">
+  <link rel="stylesheet" href="observatory-clock.css?v=20261002-2">
+  <style>
+    .instrument-temperature-title {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+    }
+    .instrument-latest-temperature {
+      font-size: 1rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-primary-dark);
+    }
+    .temperature-environment-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .temperature-environment-grid .measurement-value {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      line-height: 1.2;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-primary-dark);
+    }
+    .temperature-environment-grid .measurement-unit {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .environment-trend-list {
+      display: grid;
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .environment-trend-list img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .environment-trend-list [hidden] { display: none; }
+    @media (max-width: 700px) {
+      .temperature-environment-grid { grid-template-columns: 1fr; }
+      .page-tab { overflow-wrap: anywhere; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header observatory-header">
+    <div class="container header-inner">
+      <div>
+        <p class="observatory-site-label">Iriki Observatory</p>
+        <a class="site-title" href="observatory5-temperature-test.html">Iriki Observatory Weather Page</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-title">
+      <div class="container">
+        <div class="observatory-title-row">
+          <h1>Observatory Status</h1>
+          <div class="observatory-live-clock">
+            <span class="observatory-clock-label" id="observatory-clock-label">日本時間 (JST / NICT取得中)</span>
+            <time id="observatory-clock" aria-label="現在の日本時間">--:--:--</time>
+          </div>
+        </div>
+        <nav class="page-tabs" role="tablist" aria-label="表示ページの切り替え">
+          <button class="page-tab is-active" id="status-tab" type="button" role="tab"
+                  aria-selected="true" aria-controls="status-panel" data-tab-target="status-panel">
+            観測所ステータス
+          </button>
+          <button class="page-tab" id="instrument-temperature-tab" type="button" role="tab"
+                  aria-selected="false" aria-controls="instrument-temperature-panel"
+                  data-tab-target="instrument-temperature-panel" tabindex="-1">
+            観測装置ステータス
+          </button>
+          <button class="page-tab" id="temperature-only-tab" type="button" role="tab"
+                  aria-selected="false" aria-controls="temperature-only-panel"
+                  data-tab-target="temperature-only-panel" tabindex="-1">
+            温度表示
+          </button>
+        </nav>
+      </div>
+    </section>
+
+    <div class="page-tab-panel" id="status-panel" role="tabpanel" aria-labelledby="status-tab">
+      <section class="section observatory-dashboard-section">
+        <div class="container observatory-dashboard">
+          <article class="sky-camera-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Sky Camera</p>
+                <h2>全天カメラ</h2>
+              </div>
+              <span class="status-pill neutral" id="sky-camera-status">更新中</span>
+            </div>
+            <div class="camera-stack">
+              <figure class="sky-camera-image primary-camera">
+                <img id="sky-camera-img" data-source="../capt0000.jpg" src="images/sky-camera.jpg" width="1200" height="1200" alt="入来観測所のスカイカメラ画像">
+                <figcaption>入来観測所スカイカメラ</figcaption>
+              </figure>
+
+              <figure class="dome-camera-slot">
+                <div class="camera-placeholder">Dome Camera（なんとかする）</div>
+                <figcaption>ドーム内カメラ</figcaption>
+              </figure>
+            </div>
+          </article>
+
+          <aside class="observatory-side">
+            <article class="status-card">
+              <div class="panel-heading compact">
+                <div>
+                  <p class="eyebrow">Night Info</p>
+                  <h2>夜間情報</h2>
+                </div>
+                <span class="status-pill neutral" id="night-date">--</span>
+              </div>
+              <dl class="mini-info-grid">
+                <div><dt>日没</dt><dd id="sunset-time">--:--</dd></div>
+                <div><dt>翌朝日の出</dt><dd id="sunrise-time">--:--</dd></div>
+                <div><dt>天文薄明終了</dt><dd id="twilight-end-time">--:--</dd></div>
+                <div><dt>天文薄明開始</dt><dd id="dawn-twilight-start-time">--:--</dd></div>
+                <div><dt>月齢</dt><dd id="moon-age">--.-</dd></div>
+              </dl>
+              <p class="data-note">
+                毎朝９時に入来観測所付近の緯度経度から計算しています。<br>
+                参考: <a href="https://www.motohasi.net/SunriseSunset/WorldSun.php" target="_blank" rel="noopener noreferrer">日本と世界の日の出日の入り時間</a>
+              </p>
+            </article>
+
+            <article class="status-card">
+              <div class="panel-heading compact">
+                <div>
+                  <p class="eyebrow">Dome</p>
+                  <h2>温度・湿度</h2>
+                </div>
+                <span class="status-pill pending" id="dome-status">取得準備中</span>
+              </div>
+              <dl class="measurement-list">
+                <div>
+                  <dt>ドーム温度</dt>
+                  <dd><span class="measurement-value" id="dome-temperature">--</span> <span class="measurement-unit">度</span></dd>
+                </div>
+                <div>
+                  <dt>ドーム湿度</dt>
+                  <dd><span class="measurement-value" id="dome-humidity">--</span> <span class="measurement-unit">%</span></dd>
+                </div>
+                <div>
+                  <dt>外気温度</dt>
+                  <dd><span class="measurement-value" id="outer-temperature">--</span> <span class="measurement-unit">度</span></dd>
+                </div>
+                <div>
+                  <dt>外気湿度</dt>
+                  <dd><span class="measurement-value" id="outer-humidity">--</span> <span class="measurement-unit">%</span></dd>
+                </div>
+              </dl>
+              <p class="data-note">最新値を1分ごとに表示します。<br>ドーム最終更新: <span id="dome-updated-at">--</span><br>外気最終更新: <span id="outer-updated-at">--</span></p>
+              <div class="sensor-status-list data-note">
+                <span>ドーム: <span class="status-pill pending" id="dome-sensor-status">取得準備中</span></span>
+                <span>外気: <span class="status-pill pending" id="outer-status">取得準備中</span></span>
+              </div>
+            </article>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section dome-trend-section">
+        <div class="container">
+          <article class="status-card dome-trend-panel">
+            <div class="panel-heading compact">
+              <div>
+                <p class="eyebrow">Dome Trend</p>
+                <h2>温度/湿度推移</h2>
+              </div>
+              <span class="status-pill neutral">更新中</span>
+            </div>
+            <figure class="dome-trend-figure">
+              <img id="dome-trend-img" src="bme280_plot_dome1.png" alt="温度と湿度の推移グラフ">
+              <figcaption>温度・湿度の推移（センサーの値が最新でない場合もあるのでグラフの横軸に注意！）</figcaption>
+            </figure>
+          </article>
+        </div>
+      </section>
+
+      <section class="section soft-bg">
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">Weather Forecast</p>
+            <h2>天気予報</h2>
+            <p>MET NorwayのLocationforecast APIをもとに、入来観測所付近の今後24時間の雲量、降水量、湿度、風速、気温を表示します。</p>
+          </div>
+          <article class="weather-chart-panel">
+            <div class="panel-heading compact">
+              <div><p class="eyebrow">24 Hours</p><h3>24時間グラフ</h3></div>
+              <span class="status-pill pending" id="hourly-status">取得準備中</span>
+            </div>
+            <div class="weather-chart" id="weather-chart" aria-live="polite">
+              <p class="data-note">時間ごとの天気情報を取得しています。</p>
+            </div>
+          </article>
+          <p class="source-note">
+            24時間グラフ: <a href="https://api.met.no/" target="_blank" rel="noopener noreferrer">Weather data by MET Norway</a>
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <div class="page-tab-panel" id="instrument-temperature-panel" role="tabpanel"
+         aria-labelledby="instrument-temperature-tab" hidden>
+      <section class="section instrument-section">
+        <div class="container">
+          <article class="status-card instrument-panel">
+            <div class="panel-heading compact">
+              <div>
+                <p class="eyebrow">Instrument</p>
+                <h2>利用可能な観測装置</h2>
+              </div>
+              <span class="status-pill neutral">最新</span>
+            </div>
+            <div class="instrument-grid" aria-label="搭載可能な観測装置">
+              <!-- 状態ラベルの「搭載中／未搭載」を変更すると、見た目と下のグラフが連動します。 -->
+              <section class="instrument-slot mounted" aria-current="true" data-instrument="ksirius">
+                <div class="instrument-slot-header"><span class="instrument-index">01</span><span class="status-pill safe">搭載中</span></div>
+                <h3>kSIRIUS</h3>
+                <p>使用可能</p>
+              </section>
+              <section class="instrument-slot mounted" aria-current="true" data-instrument="optcam">
+                <div class="instrument-slot-header"><span class="instrument-index">02</span><span class="status-pill safe">未搭載</span></div>
+                <h3>OPTCAM</h3>
+                <p>使用可能</p>
+              </section>
+              <section class="instrument-slot inactive" data-instrument="kops">
+                <div class="instrument-slot-header"><span class="instrument-index">03</span><span class="status-pill neutral">搭載中</span></div>
+                <h3>KOPS</h3>
+                <p>現在は搭載されていません。</p>
+              </section>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="section instrument-temperature-section">
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">Instrument Temperature</p>
+            <h2>各装置の運用状況</h2>
+          <!--</p>各装置の検出器温度の推移を示しています。</p>-->
+          </div>
+          <div class="temperature-graph-grid">
+            <article class="status-card temperature-graph-card">
+              <div class="panel-heading compact">
+                <div><span class="instrument-index">01</span><h3>kSIRIUS</h3></div>
+                <span class="status-pill pending" id="ksirius-data-status">データ取得中</span>
+              </div>
+              <section class="instrument-current-status" aria-labelledby="ksirius-current-heading" aria-live="polite">
+                <div class="instrument-current-heading">
+                  <h4 id="ksirius-current-heading">Current Temperature</h4>
+                  <p>Last Update : <time id="ksirius-last-update">--</time></p>
+                </div>
+                <div class="instrument-readout-scroll">
+                  <table class="instrument-readout-table">
+                    <tbody>
+                      <tr>
+                        <th scope="row">Dome</th>
+                        <td class="readout-dome"><span id="ksirius-dome">--</span> K（<span id="ksirius-dome-celsius">--</span> ℃）</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">J Band</th>
+                        <td class="readout-j"><span id="ksirius-j-band">--</span> K</td>
+                        <th scope="row">H Band</th>
+                        <td class="readout-h"><span id="ksirius-h-band">--</span> K</td>
+                        <th scope="row">Ks Band</th>
+                        <td class="readout-ks"><span id="ksirius-ks-band">--</span> K</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Cold Head</th>
+                        <td class="readout-cold"><span id="ksirius-cold-head">--</span> K</td>
+                        <th scope="row">Cold Plate</th>
+                        <td class="readout-cold"><span id="ksirius-cold-plate">--</span> K</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Heat J</th>
+                        <td class="readout-j" id="ksirius-heat-j">----</td>
+                        <th scope="row">Heat H</th>
+                        <td class="readout-h" id="ksirius-heat-h">----</td>
+                        <th scope="row">Heat Ks</th>
+                        <td class="readout-ks" id="ksirius-heat-ks">----</td>
+                        <th scope="row">Heat CP</th>
+                        <td class="readout-cold" id="ksirius-heat-cp">----</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Vacuum Level</th>
+                        <td class="readout-cold" colspan="3"><span id="ksirius-vacuum">--</span> Pa</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+              <figure class="temperature-graph-figure">
+                <img src="../ksirius/day.png" width="640" height="480" alt="kSIRIUSの運用温度推移グラフ" data-temperature-graph data-instrument="ksirius">
+                <figcaption>kSIRIUS / 直近の温度推移</figcaption>
+              </figure>
+            </article>
+
+            <article class="status-card temperature-graph-card">
+              <div class="panel-heading compact">
+                <div>
+                  <span class="instrument-index">02</span>
+                  <div class="instrument-temperature-title">
+                    <h3>OPTCAM</h3>
+                    <span class="instrument-latest-temperature" aria-live="polite">検出器温度: <span id="optcam-latest-temperature" data-instrument-temperature="plot/OPTCAM_latest.json">g: <span data-temperature-channel="g">--</span> ℃ / i: <span data-temperature-channel="i">--</span> ℃</span></span>
+                  </div>
+                </div>
+                <span class="status-pill pending" data-instrument-temperature-status>取得準備中</span>
+              </div>
+              <p class="data-note">測定日時: <time data-instrument-temperature-timestamp>--</time></p>
+              <figure class="temperature-graph-figure">
+                <img src="plot/OPTCAM_tmp_plot.png" width="640" height="480" alt="OPTCAMの運用温度推移グラフ" data-temperature-graph data-instrument="optcam">
+                <figcaption>OPTCAM / 直近の温度推移</figcaption>
+              </figure>
+            </article>
+
+            <article class="status-card temperature-graph-card">
+              <div class="panel-heading compact">
+                <div>
+                  <span class="instrument-index">03</span>
+                  <div class="instrument-temperature-title">
+                    <h3>KOPS</h3>
+                    <span class="instrument-latest-temperature" aria-live="polite">検出器温度: <span id="kospec-latest-temperature" data-instrument-temperature="plot/KOspec_latest.json">--</span> ℃</span>
+                  </div>
+                </div>
+                <span class="status-pill pending" data-instrument-temperature-status>取得準備中</span>
+              </div>
+              <p class="data-note">測定日時: <time data-instrument-temperature-timestamp>--</time></p>
+              <figure class="temperature-graph-figure">
+                <img src="plot/KOspec_tmp_plot.png" width="640" height="480" alt="KOPSの運用温度推移グラフ" data-temperature-graph data-instrument="kops">
+                <figcaption>KOPS / 直近の温度推移</figcaption>
+              </figure>
+            </article>
+          </div>
+          <p class="data-note temperature-refresh-note">「装置温度チェック」タブを開いたときに、各グラフを最新画像として再読み込みします。</p>
+        </div>
+      </section>
+    </div>
+    <div class="page-tab-panel" id="temperature-only-panel" role="tabpanel"
+         aria-labelledby="temperature-only-tab" hidden>
+      <section class="section instrument-temperature-section">
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">Environment Temperature</p>
+            <h2>温度表示</h2>
+            <p>ドーム・外気・スカイカメラbox内部の温度をまとめて確認できます。</p>
+          </div>
+          <div class="temperature-environment-grid">
+            <article class="status-card">
+              <div class="panel-heading compact">
+                <div><p class="eyebrow">Dome</p><h3>ドーム温度</h3></div>
+                <span class="status-pill pending" data-temperature-source="dome-sensor-status">取得準備中</span>
+              </div>
+              <p><span class="measurement-value" data-temperature-source="dome-temperature">--</span> <span class="measurement-unit">℃</span></p>
+              <p class="data-note">最終更新: <span data-temperature-source="dome-updated-at">--</span></p>
+            </article>
+            <article class="status-card">
+              <div class="panel-heading compact">
+                <div><p class="eyebrow">Outside</p><h3>外気温度</h3></div>
+                <span class="status-pill pending" data-temperature-source="outer-status">取得準備中</span>
+              </div>
+              <p><span class="measurement-value" data-temperature-source="outer-temperature">--</span> <span class="measurement-unit">℃</span></p>
+              <p class="data-note">最終更新: <span data-temperature-source="outer-updated-at">--</span></p>
+            </article>
+            <article class="status-card" id="sky-camera-box-temperature-card" data-source="latest_camerabox.json">
+              <div class="panel-heading compact">
+                <div><p class="eyebrow">Sky Camera Box</p><h3>スカイカメラ内部温度</h3></div>
+                <span class="status-pill neutral" id="sky-camera-box-temperature-status">取得準備中</span>
+              </div>
+              <p aria-live="polite"><span class="measurement-value" id="sky-camera-box-temperature">--</span> <span class="measurement-unit">℃</span></p>
+              <p class="data-note">最終更新: <span id="sky-camera-box-updated-at">--</span></p>
+            </article>
+          </div>
+          <p class="data-note">各温度は1分ごとに更新します。データの測定日時は各カードの最終更新を確認してください。</p>
+          <div class="section-heading" style="margin-top: 32px;">
+            <p class="eyebrow">Temperature Trend</p>
+            <h2>温度推移</h2>
+            <p>各グラフは1分ごとと、このタブを開いたときに再読み込みします。既存のグラフ画像には湿度も併記されています。</p>
+          </div>
+          <div class="environment-trend-list">
+            <article class="status-card" data-environment-trend>
+              <div class="panel-heading compact">
+                <div><h3>ドームの温度推移</h3></div>
+                <span class="status-pill pending" data-plot-status>取得準備中</span>
+              </div>
+              <figure class="dome-trend-figure">
+                <img data-environment-plot="bme280_plot_dome1.png" alt="ドームの温度推移グラフ（湿度も併記）" hidden>
+                <figcaption>ドーム / 測定日時はグラフの横軸を確認してください。</figcaption>
+              </figure>
+              <p class="data-note" data-plot-error hidden>グラフ画像を取得できません（bme280_plot_dome1.png）。</p>
+            </article>
+
+            <article class="status-card" data-environment-trend>
+              <div class="panel-heading compact">
+                <div><h3>外気の温度推移</h3></div>
+                <span class="status-pill pending" data-plot-status>取得準備中</span>
+              </div>
+              <figure class="dome-trend-figure">
+                <img data-environment-plot="bme280_plot_outside.png" alt="外気の温度推移グラフ（湿度も併記）" hidden>
+                <figcaption>外気 / 測定日時はグラフの横軸を確認してください。</figcaption>
+              </figure>
+              <p class="data-note" data-plot-error hidden>グラフ画像を取得できません（bme280_plot_outer.png）。</p>
+            </article>
+
+            <article class="status-card" data-environment-trend>
+              <div class="panel-heading compact">
+                <div><h3>スカイカメラの箱の温度推移</h3></div>
+                <span class="status-pill pending" data-plot-status>取得準備中</span>
+              </div>
+              <figure class="dome-trend-figure">
+                <img data-environment-plot="bme280_plot_camerabox.png" alt="スカイカメラの箱の温度推移グラフ（湿度も併記）" hidden>
+                <figcaption>スカイカメラの箱 / 測定日時はグラフの横軸を確認してください。</figcaption>
+              </figure>
+              <p class="data-note" data-plot-error hidden>グラフ画像を取得できません（bme280_plot_camerabox.png）。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>&copy; Iriki Observatory</p>
+      <p>表示内容は観測準備の補助情報です。実際の観測判断では最新の現地情報を確認してください。</p>
+    </div>
+  </footer>
+  <script src="observatory-clock.js?v=20261002-3"></script>
+  <script src="observatory-camera.js?v=20261002-2"></script>
+  <script src="observatory-night.js"></script>
+  <script src="observatory-dome.js?v=20261106-1"></script>
+  <script src="observatory-dome-plot.js"></script>
+  <script src="observatory-weather.js"></script>
+  <script src="observatory-tabs.js?v=20261109-1"></script>
+  <script src="observatory-ksirius.js"></script>
+  <script src="observatory-instrument-temperatures.js"></script>
+  <script>
+    (function () {
+      "use strict";
+
+      // Mirror existing readouts so both tabs share each sensor's fetch and timer.
+      var panel = document.getElementById("temperature-only-panel");
+      panel.querySelectorAll("[data-temperature-source]").forEach(function (target) {
+        var source = document.getElementById(target.dataset.temperatureSource);
+        if (!source) { return; }
+        function sync() {
+          target.textContent = source.textContent;
+          if (source.classList.contains("status-pill")) {
+            target.className = source.className;
+          }
+        }
+        sync();
+        new MutationObserver(sync).observe(source, {
+          childList: true, characterData: true, subtree: true,
+          attributes: true, attributeFilter: ["class"]
+        });
+      });
+
+      var plots = panel.querySelectorAll("[data-environment-plot]");
+      plots.forEach(function (image) {
+        var card = image.closest("[data-environment-trend]");
+        var status = card.querySelector("[data-plot-status]");
+        var error = card.querySelector("[data-plot-error]");
+        image.addEventListener("load", function () {
+          image.hidden = false;
+          error.hidden = true;
+          status.textContent = "表示済み";
+          status.className = "status-pill neutral";
+        });
+        image.addEventListener("error", function () {
+          image.hidden = true;
+          error.hidden = false;
+          status.textContent = "未取得";
+          status.className = "status-pill neutral";
+        });
+      });
+      function refreshEnvironmentPlots() {
+        if (panel.hidden) { return; }
+        var timestamp = Date.now();
+        plots.forEach(function (image) {
+          var status = image.closest("[data-environment-trend]").querySelector("[data-plot-status]");
+          status.textContent = "取得中";
+          status.className = "status-pill pending";
+          image.src = image.dataset.environmentPlot + "?t=" + timestamp;
+        });
+      }
+      new MutationObserver(refreshEnvironmentPlots).observe(panel, {
+        attributes: true, attributeFilter: ["hidden"]
+      });
+      refreshEnvironmentPlots();
+      window.setInterval(refreshEnvironmentPlots, 60 * 1000);
+
+      // The sky camera box reads temperature_C and timestamp from latest_camerabox.json.
+      // Expected JSON: { "temperature_C": 23.5, "timestamp": "2026-10-20 18:00:00" }
+      var boxCard = document.getElementById("sky-camera-box-temperature-card");
+      var boxStatus = document.getElementById("sky-camera-box-temperature-status");
+      var boxTemperature = document.getElementById("sky-camera-box-temperature");
+      var boxUpdatedAt = document.getElementById("sky-camera-box-updated-at");
+      function refreshBoxTemperature() {
+        var sourceUrl = boxCard.dataset.source.trim();
+        if (!sourceUrl) { return; }
+        boxStatus.textContent = "取得中";
+        boxStatus.className = "status-pill pending";
+        fetch(sourceUrl, { cache: "no-store" })
+          .then(function (response) {
+            if (!response.ok) { throw new Error("HTTP " + response.status); }
+            return response.json();
+          })
+          .then(function (data) {
+            var raw = data.temperature_C;
+            if ((typeof raw !== "number" && typeof raw !== "string") ||
+                (typeof raw === "string" && !raw.trim()) || !Number.isFinite(Number(raw))) {
+              throw new Error("Invalid temperature_C");
+            }
+            boxTemperature.textContent = Number(raw).toFixed(1);
+            boxUpdatedAt.textContent = data.timestamp || "--";
+            boxStatus.textContent = "表示済み";
+            boxStatus.className = "status-pill neutral";
+          })
+          .catch(function () {
+            boxTemperature.textContent = "--";
+            boxUpdatedAt.textContent = "--";
+            boxStatus.textContent = "未取得";
+            boxStatus.className = "status-pill neutral";
+          });
+      }
+      refreshBoxTemperature();
+      window.setInterval(refreshBoxTemperature, 60 * 1000);
+    }());
+  </script>
+</body>
+</html>

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iriki Observatory Weather Page</title>
   <meta name="description" content="入来観測所のスカイカメラ画像、ドーム内温度、2日間の天気予報をまとめて確認できるページです。">
-  <link rel="stylesheet" href="observatory.css?v=20260601">
+  <link rel="stylesheet" href="observatory.css?v=20261002-6">
 </head>
 <body>
   <header class="site-header observatory-header">
@@ -38,7 +38,7 @@
           <div class="camera-stack">
             <figure class="sky-camera-image primary-camera">
               <!-- 自動更新画像のURLが決まったら、下のsrcを差し替えてください。 -->
-              <img id="sky-camera-img" src="../capt0000.jpg" alt="入来観測所のスカイカメラ画像">
+              <img id="sky-camera-img" data-source="../capt0000.jpg" src="images/sky-camera.jpg" width="1200" height="1200" alt="入来観測所のスカイカメラ画像">
               <figcaption>入来観測所スカイカメラ</figcaption>
             </figure>
 
@@ -97,7 +97,7 @@
             <dl class="measurement-list">
               <div>
                 <dt>テスト温度</dt>
-                <dd><span class="measurement-value" id="dome-temperature">--.-</span> <span class="measurement-unit">度</span></dd>
+                <dd><span class="measurement-value" id="dome-temperature">--</span> <span class="measurement-unit">度</span></dd>
               </div>
               <div>
                 <dt>テスト湿度</dt>
@@ -105,14 +105,18 @@
               </div>
               <div>
                 <dt>ドーム外温度</dt>
-                <dd><span class="measurement-value">--.-</span> <span class="measurement-unit">deg C</span></dd>
+                <dd><span class="measurement-value" id="outer-temperature">--</span> <span class="measurement-unit">℃</span></dd>
               </div>
               <div>
                 <dt>ドーム外湿度</dt>
-                <dd><span class="measurement-value">--</span> <span class="measurement-unit">%</span></dd>
+                <dd><span class="measurement-value" id="outer-humidity">--</span> <span class="measurement-unit">%</span></dd>
               </div>
             </dl>
-            <p class="data-note">最新値を1分ごとに表示します。<br>最終更新: <span id="dome-updated-at">--</span></p>
+            <p class="data-note">最新値を1分ごとに表示します。<br>ドーム最終更新: <span id="dome-updated-at">--</span><br>外気最終更新: <span id="outer-updated-at">--</span></p>
+            <div class="sensor-status-list data-note">
+              <span>ドーム: <span class="status-pill pending" id="dome-sensor-status">取得準備中</span></span>
+              <span>外気: <span class="status-pill pending" id="outer-status">取得準備中</span></span>
+            </div>
           </article>
 
           <!-- <article class="status-card compact-status-card">
@@ -178,9 +182,9 @@
       <p>表示内容は観測準備の補助情報です。実際の観測判断では最新の現地情報を確認してください。</p>
     </div>
   </footer>
-  <script src="observatory-camera.js"></script>
+  <script src="observatory-camera.js?v=20261002-2"></script>
   <script src="observatory-night.js"></script>
-  <script src="observatory-dome.js"></script>
+  <script src="observatory-dome.js?v=20261106-1"></script>
   <script src="observatory-weather.js"></script>
 </body>
 </html>

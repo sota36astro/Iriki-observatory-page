@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iriki Observatory Weather Page</title>
   <meta name="description" content="入来観測所の全天カメラ、気象情報、観測装置の運用温度をまとめて確認できるページです。">
-  <link rel="stylesheet" href="observatory.css?v=20260722">
+  <link rel="stylesheet" href="observatory.css?v=20261002-6">
 </head>
 <body>
   <header class="site-header observatory-header">
@@ -48,7 +48,7 @@
             </div>
             <div class="camera-stack">
               <figure class="sky-camera-image primary-camera">
-                <img id="sky-camera-img" src="../capt0000.jpg" alt="入来観測所のスカイカメラ画像">
+                <img id="sky-camera-img" data-source="../capt0000.jpg" src="images/sky-camera.jpg" width="1200" height="1200" alt="入来観測所のスカイカメラ画像">
                 <figcaption>入来観測所スカイカメラ</figcaption>
               </figure>
 
@@ -91,23 +91,27 @@
               </div>
               <dl class="measurement-list">
                 <div>
-                  <dt>テスト温度</dt>
-                  <dd><span class="measurement-value" id="dome-temperature">--.-</span> <span class="measurement-unit">度</span></dd>
+                  <dt>ドーム温度</dt>
+                  <dd><span class="measurement-value" id="dome-temperature">--</span> <span class="measurement-unit">度</span></dd>
                 </div>
                 <div>
-                  <dt>テスト湿度</dt>
+                  <dt>ドーム湿度</dt>
                   <dd><span class="measurement-value" id="dome-humidity">--</span> <span class="measurement-unit">%</span></dd>
                 </div>
                 <div>
-                  <dt>ドーム外温度</dt>
-                  <dd><span class="measurement-value">--.-</span> <span class="measurement-unit">deg C</span></dd>
+                  <dt>外気温度</dt>
+                  <dd><span class="measurement-value" id="outer-temperature">--</span> <span class="measurement-unit">℃</span></dd>
                 </div>
                 <div>
-                  <dt>ドーム外湿度</dt>
-                  <dd><span class="measurement-value">--</span> <span class="measurement-unit">%</span></dd>
+                  <dt>外気湿度</dt>
+                  <dd><span class="measurement-value" id="outer-humidity">--</span> <span class="measurement-unit">%</span></dd>
                 </div>
               </dl>
-              <p class="data-note">最新値を1分ごとに表示します。<br>最終更新: <span id="dome-updated-at">--</span></p>
+              <p class="data-note">最新値を1分ごとに表示します。<br>ドーム最終更新: <span id="dome-updated-at">--</span><br>外気最終更新: <span id="outer-updated-at">--</span></p>
+              <div class="sensor-status-list data-note">
+                <span>ドーム: <span class="status-pill pending" id="dome-sensor-status">取得準備中</span></span>
+                <span>外気: <span class="status-pill pending" id="outer-status">取得準備中</span></span>
+              </div>
             </article>
           </aside>
         </div>
@@ -255,7 +259,7 @@
                 <span class="status-pill neutral">温度推移</span>
               </div>
               <figure class="temperature-graph-figure">
-                <img src="../optcam/day.png" width="640" height="480" alt="OPTCAMの運用温度推移グラフ" data-temperature-graph>
+                <img src="plot/none.png" width="640" height="480" alt="OPTCAMの運用温度推移グラフ" data-temperature-graph>
                 <figcaption>OPTCAM / 直近の温度推移</figcaption>
               </figure>
             </article>
@@ -266,7 +270,7 @@
                 <span class="status-pill neutral">温度推移</span>
               </div>
               <figure class="temperature-graph-figure">
-                <img src="../kospec/day.png" width="640" height="480" alt="KOspecの運用温度推移グラフ" data-temperature-graph>
+                <img src="plot/KOspec_tmp_plot.png" width="640" height="480" alt="KOspecの運用温度推移グラフ" data-temperature-graph>
                 <figcaption>KOspec / 直近の温度推移</figcaption>
               </figure>
             </article>
@@ -283,9 +287,9 @@
       <p>表示内容は観測準備の補助情報です。実際の観測判断では最新の現地情報を確認してください。</p>
     </div>
   </footer>
-  <script src="observatory-camera.js"></script>
+  <script src="observatory-camera.js?v=20261002-2"></script>
   <script src="observatory-night.js"></script>
-  <script src="observatory-dome.js"></script>
+  <script src="observatory-dome.js?v=20261106-1"></script>
   <script src="observatory-dome-plot.js"></script>
   <script src="observatory-weather.js"></script>
   <script src="observatory-tabs.js"></script>
